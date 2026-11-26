@@ -1,0 +1,5 @@
+-- EXPECT: OK
+begin
+  select 1; -- comentario al final
+  -- ; end begin
+end; -- fin

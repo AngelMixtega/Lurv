@@ -1,0 +1,9 @@
+-- EXPECT: OK
+begin
+  fn ~pi() -> float => 3.141592;
+  fn ~doble(@x : float) -> float => @x *: 2;
+  fn ~promedio(@a : float, @b : float) -> float
+    => (@a +: @b) /: 2;
+  fn ~transformar(@x : float) -> float => ~cuadrado(~doble(@x));
+  fn ~saluda(@n : string) -> string => "Hola ";
+end;

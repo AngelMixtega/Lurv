@@ -1,0 +1,4 @@
+-- EXPECT: LEX002
+begin
+  let @x : Float := 1;
+end;

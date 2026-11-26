@@ -1,0 +1,7 @@
+-- EXPECT: OK
+begin
+  for @i from 0 to 100 step 5 where @i %: 2 ?= 0 begin
+    select @i;
+  end;
+  for @j from @a +: 1 to ~doble(@b) where ?par(@j) begin end;
+end;

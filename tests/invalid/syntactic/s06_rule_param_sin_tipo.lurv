@@ -1,0 +1,4 @@
+-- EXPECT: SYN001
+begin
+  rule ?par(@x) :- true;
+end;

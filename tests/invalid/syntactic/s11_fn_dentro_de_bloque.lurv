@@ -1,0 +1,6 @@
+-- EXPECT: SYN001
+begin
+  if true begin
+    fn ~f() -> int => 1;
+  end;
+end;

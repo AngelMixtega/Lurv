@@ -1,0 +1,4 @@
+-- EXPECT: LEX001
+begin
+  select €;
+end;

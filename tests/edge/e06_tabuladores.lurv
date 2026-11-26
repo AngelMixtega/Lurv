@@ -1,0 +1,7 @@
+-- EXPECT: OK
+begin
+	let @x : int := 10;
+	if @x ?> 1 begin
+		select @x;
+	end;
+end;

@@ -1,0 +1,5 @@
+-- EXPECT: OK
+-- TREE: ~f((1 +: 2), @x)
+begin
+  select ~f(1 +: 2, @x);
+end;

@@ -1,0 +1,4 @@
+-- EXPECT: SYN001
+begin
+  let @x : float := 1 2;
+end;

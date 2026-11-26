@@ -1,0 +1,6 @@
+-- EXPECT: OK
+begin
+  let @nombre : string := "";
+  select "Introduce tu nombre:";
+  read @nombre;
+end;

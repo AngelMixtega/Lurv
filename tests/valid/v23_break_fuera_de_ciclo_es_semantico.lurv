@@ -1,0 +1,5 @@
+-- EXPECT: OK
+begin
+  break;
+  continue;
+end;

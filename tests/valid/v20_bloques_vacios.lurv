@@ -1,0 +1,6 @@
+-- EXPECT: OK
+begin
+  if true begin end;
+  while false begin end;
+  for @i from 1 to 2 begin end;
+end;

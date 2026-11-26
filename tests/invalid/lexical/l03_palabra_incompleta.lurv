@@ -1,0 +1,4 @@
+-- EXPECT: LEX002
+begin
+  selec 5;
+end;

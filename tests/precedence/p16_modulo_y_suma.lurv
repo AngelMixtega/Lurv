@@ -1,0 +1,5 @@
+-- EXPECT: OK
+-- TREE: (1 +: (7 %: 3))
+begin
+  select 1 +: 7 %: 3;
+end;

@@ -1,0 +1,5 @@
+-- EXPECT: OK
+-- Comentario: áéíóú ñ ü ¿¡
+begin
+  select "Canción ñandú ¿cómo estás?"; -- más acentos
+end;

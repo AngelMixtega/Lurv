@@ -1,0 +1,4 @@
+-- EXPECT: SYN001
+begin
+  for @i from 1 to 10 step begin end;
+end;

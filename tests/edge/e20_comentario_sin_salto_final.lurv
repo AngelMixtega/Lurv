@@ -1,0 +1,2 @@
+-- EXPECT: OK
+begin end; -- sin salto de linea al final

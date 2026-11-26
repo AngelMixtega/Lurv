@@ -1,0 +1,4 @@
+-- EXPECT: SYN001
+begin
+  fn ~f() -> => 1;
+end;

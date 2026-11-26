@@ -1,0 +1,3 @@
+-- EXPECT: LEX001
+begin end;
+!

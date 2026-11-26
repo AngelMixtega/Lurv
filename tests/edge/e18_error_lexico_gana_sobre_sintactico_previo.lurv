@@ -1,0 +1,5 @@
+-- EXPECT: LEX001
+begin
+  select ;
+  select $;
+end;

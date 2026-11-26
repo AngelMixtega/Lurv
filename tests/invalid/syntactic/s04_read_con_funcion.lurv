@@ -1,0 +1,4 @@
+-- EXPECT: SYN001
+begin
+  read ~doble;
+end;

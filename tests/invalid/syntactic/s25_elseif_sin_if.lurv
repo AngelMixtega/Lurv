@@ -1,0 +1,4 @@
+-- EXPECT: SYN001
+begin
+  elseif true begin end;
+end;

@@ -1,0 +1,411 @@
+/*
+ * ============================================================
+ *  Lurv.jj  -  UNICO archivo de gramatica de Lurv (JavaCC 7.0.13)
+ *  Se edita AQUI. Nunca se edita nada dentro de generated\.
+ *
+ *  Secciones:
+ *   [1] OPCIONES            [9]  TOKENS DE ERROR
+ *   [2] CLASE PARSER (Java) [10] PRODUCCION PRINCIPAL
+ *   [3] SKIP                [11] DECLARACIONES Y ASIGNACION
+ *   [4] PALABRAS RESERVADAS [12] ENTRADA / SALIDA
+ *   [5] OPERADORES          [13] CONDICIONALES
+ *   [6] DELIMITADORES       [14] CICLOS
+ *   [7] IDENTIFICADORES     [15] FUNCIONES Y REGLAS
+ *   [8] LITERALES           [16] EXPRESIONES
+ * ============================================================
+ */
+
+/* ============================================================
+ *  [1] OPCIONES
+ *  STATIC = false      -> el parser es un objeto normal (new LurvParser(...))
+ *  UNICODE_INPUT = true -> acepta acentos y cualquier caracter Unicode en la entrada
+ *  (No hay LOOKAHEAD global: la gramatica es LL(1).)
+ * ============================================================ */
+options {
+    STATIC = false;
+    UNICODE_INPUT = true;
+}
+
+/* ============================================================
+ *  [2] CLASE PARSER (codigo Java que JavaCC copia tal cual)
+ *  El programa principal (main) NO esta aqui: esta en src\main\LurvMain.java
+ * ============================================================ */
+PARSER_BEGIN(LurvParser)
+package lurv.parser;
+
+public class LurvParser {
+
+    /* Si es true, las producciones imprimen la agrupacion de cada expresion (--tree) */
+    public boolean mostrarArbol = false;
+
+    /* Imprime el arbol de una expresion (solo si --tree esta activo) */
+    void arbol(String e) {
+        if (mostrarArbol) System.out.println("ARBOL (linea " + token.beginLine + "): " + e);
+    }
+}
+PARSER_END(LurvParser)
+
+/* ============================================================
+ *  [3] SKIP: lo que el analizador descarta
+ *  espacio, tabulador, CR, LF y comentarios  "--" hasta fin de linea
+ *  (por la coincidencia mas larga, "--" gana a "-" y a "-:")
+ * ============================================================ */
+SKIP : {
+    " "
+  | "\t"
+  | "\r"
+  | "\n"
+  | < COMENTARIO: "--" (~["\n","\r"])* >
+}
+
+/* ============================================================
+ *  [4] PALABRAS RESERVADAS (una por linea: agregar/quitar = 1 linea)
+ *  Solo minusculas. Van ANTES de ERR_WORD para ganar el empate.
+ * ============================================================ */
+TOKEN : {
+    < BEGIN:    "begin" >      /* abre programa o bloque        */
+  | < END:      "end" >        /* cierra programa o bloque      */
+  | < LET:      "let" >        /* declaracion de variable       */
+  | < FN:       "fn" >         /* funcion                       */
+  | < RULE:     "rule" >       /* regla logica                  */
+  | < READ:     "read" >       /* entrada                       */
+  | < SELECT:   "select" >     /* salida                        */
+  | < WHERE:    "where" >      /* condicion de select / for     */
+  | < IF:       "if" >         /* condicional                   */
+  | < ELSEIF:   "elseif" >     /* condicional encadenado        */
+  | < ELSE:     "else" >       /* alternativa                   */
+  | < WHILE:    "while" >      /* ciclo condicional             */
+  | < FOR:      "for" >        /* ciclo con contador            */
+  | < FROM:     "from" >       /* inicio del for                */
+  | < TO:       "to" >         /* limite del for                */
+  | < STEP:     "step" >       /* paso del for                  */
+  | < BREAK:    "break" >      /* salir del ciclo               */
+  | < CONTINUE: "continue" >   /* siguiente iteracion           */
+  | < T_FLOAT:  "float" >      /* tipo decimal                  */
+  | < T_INT:    "int" >        /* tipo entero                   */
+  | < T_STRING: "string" >     /* tipo cadena                   */
+  | < T_LOGIC:  "logic" >      /* tipo logico                   */
+  | < TRUE:     "true" >       /* literal logico                */
+  | < FALSE:    "false" >      /* literal logico                */
+  | < AND:      "and" >        /* conjuncion                    */
+  | < OR:       "or" >         /* disyuncion                    */
+  | < NOT:      "not" >        /* negacion                      */
+}
+
+/* ============================================================
+ *  [5] OPERADORES
+ *  Se reconocen por coincidencia mas larga: "?<>" gana a "?<" y a "?".
+ * ============================================================ */
+TOKEN : {
+    < PLUS:   "+:" >       /* suma            */
+  | < MINUS:  "-:" >       /* resta           */
+  | < TIMES:  "*:" >       /* multiplicacion  */
+  | < DIV:    "/:" >       /* division        */
+  | < MOD:    "%:" >       /* modulo          */
+  | < POW:    "'"  >       /* potencia        */
+  | < NEG:    "-"  >       /* negacion unaria */
+  | < EQ:     "?=" >       /* igual           */
+  | < NE:     "?<>" >      /* diferente       */
+  | < LT:     "?<" >       /* menor           */
+  | < GT:     "?>" >       /* mayor           */
+  | < LE:     "?<=" >      /* menor o igual   */
+  | < GE:     "?>=" >      /* mayor o igual   */
+  | < ASSIGN: ":=" >       /* asignacion      */
+  | < COND:   ":-" >       /* cuerpo de rule  */
+  | < ARROW:  "->" >       /* tipo de retorno */
+  | < FARROW: "=>" >       /* cuerpo de fn    */
+}
+
+/* ============================================================
+ *  [6] DELIMITADORES Y PUNTUACION
+ * ============================================================ */
+TOKEN : {
+    < COLON:  ":" >
+  | < SEMI:   ";" >        /* terminador de instruccion */
+  | < LPAREN: "(" >
+  | < RPAREN: ")" >
+  | < COMMA:  "," >
+}
+
+/* ============================================================
+ *  [7] IDENTIFICADORES
+ *  prefijo obligatorio (@ ~ ?) + letra + letras/digitos/_
+ *  Los tokens privados (#) son "piezas": no se devuelven al parser.
+ * ============================================================ */
+TOKEN : {
+    < #LETRA:   ["a"-"z","A"-"Z"] >
+  | < #DIGITO:  ["0"-"9"] >
+  | < #RESTO_ID: ["a"-"z","A"-"Z","0"-"9","_"] >
+  | < VAR_ID:  "@" <LETRA> (<RESTO_ID>)* >    /* variable / parametro */
+  | < FUN_ID:  "~" <LETRA> (<RESTO_ID>)* >    /* funcion              */
+  | < RULE_ID: "?" <LETRA> (<RESTO_ID>)* >    /* regla logica         */
+}
+
+/* ============================================================
+ *  [8] LITERALES
+ *  El signo negativo NO es parte del literal (es el operador NEG).
+ * ============================================================ */
+TOKEN : {
+    < INT_LIT:    (<DIGITO>)+ >
+  | < FLOAT_LIT:  (<DIGITO>)+ "." (<DIGITO>)+ >
+  | < STRING_LIT: "\"" (~["\"","\r","\n"])* "\"" >
+}
+
+/* ============================================================
+ *  [9] TOKENS DE ERROR  (SIEMPRE AL FINAL de los TOKEN)
+ *  JavaCC elige la coincidencia MAS LARGA y, si empatan, la declarada
+ *  primero. Por eso "begin" (reservada) gana a ERR_WORD, pero "beginend"
+ *  (mas larga) la captura ERR_WORD completa.
+ * ============================================================ */
+TOKEN : {
+    < ERR_WORD:   ["a"-"z","A"-"Z","_"] (["a"-"z","A"-"Z","0"-"9","_"])* >
+  | < ERR_NUMBER: (<DIGITO>)+ ( "." (<DIGITO>)* )? ["a"-"z","A"-"Z","_"]
+                  (["a"-"z","A"-"Z","0"-"9","_","."])*
+                | (<DIGITO>)+ "." >
+  | < ERR_PREFIX: ["@","~","?"] >
+  | < ERR_STRING: "\"" (~["\"","\r","\n"])* >
+  | < ERR_SYMBOL: ["=","<",">","."] >
+  | < ERR_CHAR:   ~[] >      /* CUALQUIER otro caracter ($ # { ! ...) -> LEX001.
+                                Va el ULTIMO: solo gana si nadie mas coincide.
+                                Asi no dependemos de TokenMgrError (que reporta
+                                mal la columna si el caracter es el final del archivo) */
+}
+
+/* ============================================================
+ *  [10] PRODUCCION PRINCIPAL
+ * ============================================================ */
+
+/* Programa ::= "begin" { Elemento } "end" ";" EOF
+   Exigir <EOF> es lo que rechaza cualquier contenido despues de "end;" */
+void Programa() : {} {
+    <BEGIN> ( Elemento() )* <END> <SEMI> <EOF>
+}
+
+/* Elemento ::= Funcion | Regla | Instruccion
+   fn y rule solo existen aqui (nivel principal), no dentro de un Bloque */
+void Elemento() : {} {
+    Funcion()
+  | Regla()
+  | Instruccion()
+}
+
+/* Instruccion ::= Declaracion | Asignacion | Lectura | Salida | Condicional
+                 | Mientras | Para | Romper | Continuar
+   Cada alternativa empieza con un token distinto (LET, VAR_ID, READ, ...): LL(1) */
+void Instruccion() : {} {
+    Declaracion()
+  | Asignacion()
+  | Lectura()
+  | Salida()
+  | Condicional()
+  | Mientras()
+  | Para()
+  | Romper()
+  | Continuar()
+}
+
+/* Bloque ::= "begin" { Instruccion } "end"
+   (sin ";" aqui: el ";" lo pone la estructura que contiene al bloque) */
+void Bloque() : {} {
+    <BEGIN> ( Instruccion() )* <END>
+}
+
+/* Tipo ::= "float" | "int" | "string" | "logic" */
+void Tipo() : {} {
+    <T_FLOAT> | <T_INT> | <T_STRING> | <T_LOGIC>
+}
+
+/* ============================================================
+ *  [11] DECLARACIONES Y ASIGNACION
+ * ============================================================ */
+
+/* Declaracion ::= "let" VAR_ID ":" Tipo ":=" Expresion ";" */
+void Declaracion() : { String e; } {
+    <LET> <VAR_ID> <COLON> Tipo() <ASSIGN> e = Expresion() <SEMI>
+    { arbol(e); }
+}
+
+/* Asignacion ::= VAR_ID ":=" Expresion ";" */
+void Asignacion() : { String e; } {
+    <VAR_ID> <ASSIGN> e = Expresion() <SEMI>
+    { arbol(e); }
+}
+
+/* ============================================================
+ *  [12] ENTRADA / SALIDA
+ * ============================================================ */
+
+/* Lectura ::= "read" VAR_ID ";" */
+void Lectura() : {} {
+    <READ> <VAR_ID> <SEMI>
+}
+
+/* Salida ::= "select" Expresion { "," Expresion } [ "where" Expresion ] ";" */
+void Salida() : { String e; } {
+    <SELECT> e = Expresion() { arbol(e); }
+    ( <COMMA> e = Expresion() { arbol(e); } )*
+    [ <WHERE> e = Expresion() { arbol(e); } ]
+    <SEMI>
+}
+
+/* ============================================================
+ *  [13] CONDICIONALES
+ * ============================================================ */
+
+/* Condicional ::= "if" Expresion Bloque { "elseif" Expresion Bloque }
+                   [ "else" Bloque ] ";"
+   Sin ";" antes de "else": solo el ultimo "end" lleva ";" */
+void Condicional() : { String e; } {
+    <IF> e = Expresion() { arbol(e); } Bloque()
+    ( <ELSEIF> e = Expresion() { arbol(e); } Bloque() )*
+    [ <ELSE> Bloque() ]
+    <SEMI>
+}
+
+/* ============================================================
+ *  [14] CICLOS (while, for) Y CONTROL DE CICLO
+ * ============================================================ */
+
+/* Mientras ::= "while" Expresion Bloque ";" */
+void Mientras() : { String e; } {
+    <WHILE> e = Expresion() { arbol(e); } Bloque() <SEMI>
+}
+
+/* Para ::= "for" VAR_ID "from" Expresion "to" Expresion
+            [ "step" Expresion ] [ "where" Expresion ] Bloque ";" */
+void Para() : { String e; } {
+    <FOR> <VAR_ID>
+    <FROM> e = Expresion() { arbol(e); }
+    <TO>   e = Expresion() { arbol(e); }
+    [ <STEP>  e = Expresion() { arbol(e); } ]
+    [ <WHERE> e = Expresion() { arbol(e); } ]
+    Bloque() <SEMI>
+}
+
+/* Romper ::= "break" ";"      (que este dentro de un ciclo es un chequeo SEMANTICO: no se hace aqui) */
+void Romper() : {} {
+    <BREAK> <SEMI>
+}
+
+/* Continuar ::= "continue" ";" (igual: chequeo semantico, fuera de alcance) */
+void Continuar() : {} {
+    <CONTINUE> <SEMI>
+}
+
+/* ============================================================
+ *  [15] FUNCIONES Y REGLAS
+ * ============================================================ */
+
+/* Funcion ::= "fn" FUN_ID "(" [ Parametros ] ")" "->" Tipo "=>" Expresion ";" */
+void Funcion() : { String e; } {
+    <FN> <FUN_ID> <LPAREN> [ Parametros() ] <RPAREN>
+    <ARROW> Tipo() <FARROW> e = Expresion() <SEMI>
+    { arbol(e); }
+}
+
+/* Regla ::= "rule" RULE_ID "(" [ Parametros ] ")" ":-" Expresion ";" */
+void Regla() : { String e; } {
+    <RULE> <RULE_ID> <LPAREN> [ Parametros() ] <RPAREN>
+    <COND> e = Expresion() <SEMI>
+    { arbol(e); }
+}
+
+/* Parametros ::= Param { "," Param } */
+void Parametros() : {} {
+    Param() ( <COMMA> Param() )*
+}
+
+/* Param ::= VAR_ID ":" Tipo */
+void Param() : {} {
+    <VAR_ID> <COLON> Tipo()
+}
+
+/* ============================================================
+ *  [16] EXPRESIONES  (de menor a mayor precedencia)
+ *  Cada produccion devuelve un String con la agrupacion explicita
+ *  (solo para --tree; NO se evalua nada).
+ * ============================================================ */
+
+/* Expresion ::= Or */
+String Expresion() : { String e; } {
+    e = Or() { return e; }
+}
+
+/* Or ::= And { "or" And }                       (asociativo a la izquierda) */
+String Or() : { String a, b; } {
+    a = And() ( <OR> b = And() { a = "(" + a + " or " + b + ")"; } )*
+    { return a; }
+}
+
+/* And ::= Not { "and" Not }                     (izquierda) */
+String And() : { String a, b; } {
+    a = Not() ( <AND> b = Not() { a = "(" + a + " and " + b + ")"; } )*
+    { return a; }
+}
+
+/* Not ::= "not" Not | Relacional                (not es mas debil que las comparaciones) */
+String Not() : { String a; } {
+    <NOT> a = Not() { return "(not " + a + ")"; }
+  | a = Relacional() { return a; }
+}
+
+/* Relacional ::= Suma [ ( "?=" | "?<>" | "?<" | "?>" | "?<=" | "?>=" ) Suma ]
+   El [ ] (una sola vez, no { }) hace que NO sea asociativo: a ?< b ?< c es error */
+String Relacional() : { String a, b; Token t; } {
+    a = Suma()
+    [ ( t = <EQ> | t = <NE> | t = <LT> | t = <GT> | t = <LE> | t = <GE> )
+      b = Suma() { a = "(" + a + " " + t.image + " " + b + ")"; } ]
+    { return a; }
+}
+
+/* Suma ::= Producto { ( "+:" | "-:" ) Producto }   (izquierda) */
+String Suma() : { String a, b; Token t; } {
+    a = Producto()
+    ( ( t = <PLUS> | t = <MINUS> ) b = Producto()
+      { a = "(" + a + " " + t.image + " " + b + ")"; } )*
+    { return a; }
+}
+
+/* Producto ::= Unario { ( "*:" | "/:" | "%:" ) Unario }   (izquierda) */
+String Producto() : { String a, b; Token t; } {
+    a = Unario()
+    ( ( t = <TIMES> | t = <DIV> | t = <MOD> ) b = Unario()
+      { a = "(" + a + " " + t.image + " " + b + ")"; } )*
+    { return a; }
+}
+
+/* Unario ::= "-" Unario | Potencia
+   Como Potencia esta DEBAJO de Unario: -2 ' 2  es  -(2 ' 2) */
+String Unario() : { String a; } {
+    <NEG> a = Unario() { return "(-" + a + ")"; }
+  | a = Potencia() { return a; }
+}
+
+/* Potencia ::= Primario [ "'" Unario ]            (derecha)
+   El lado derecho es Unario: permite 2 ' -1 y hace 2 ' 3 ' 2 = 2 ' (3 ' 2) */
+String Potencia() : { String a, b; Token t; } {
+    a = Primario()
+    [ t = <POW> b = Unario() { a = "(" + a + " " + t.image + " " + b + ")"; } ]
+    { return a; }
+}
+
+/* Primario ::= INT_LIT | FLOAT_LIT | STRING_LIT | "true" | "false" | VAR_ID
+              | FUN_ID Args | RULE_ID Args | "(" Expresion ")" */
+String Primario() : { String a; Token t; } {
+    ( t = <INT_LIT> | t = <FLOAT_LIT> | t = <STRING_LIT>
+    | t = <TRUE> | t = <FALSE> | t = <VAR_ID> )
+    { return t.image; }
+  | ( t = <FUN_ID> | t = <RULE_ID> ) a = Args()
+    { return t.image + a; }
+  | <LPAREN> a = Expresion() <RPAREN>
+    { return a; }
+}
+
+/* Args ::= "(" [ Expresion { "," Expresion } ] ")" */
+String Args() : { String a, b; String r = ""; } {
+    <LPAREN>
+    [ a = Expresion() { r = a; }
+      ( <COMMA> b = Expresion() { r = r + ", " + b; } )* ]
+    <RPAREN>
+    { return "(" + r + ")"; }
+}

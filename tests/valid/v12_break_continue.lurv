@@ -1,0 +1,7 @@
+-- EXPECT: OK
+begin
+  while true begin
+    if @x ?> 3 begin break; end;
+    continue;
+  end;
+end;

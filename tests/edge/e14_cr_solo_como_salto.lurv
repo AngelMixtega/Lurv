@@ -1,0 +1,1 @@
+-- EXPECT: OKbegin  select 1;end;

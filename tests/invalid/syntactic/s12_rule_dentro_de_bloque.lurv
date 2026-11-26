@@ -1,0 +1,6 @@
+-- EXPECT: SYN001
+begin
+  while true begin
+    rule ?r() :- true;
+  end;
+end;

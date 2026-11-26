@@ -1,0 +1,5 @@
+-- EXPECT: OK
+-- TREE: (@a or (@b and @c))
+begin
+  select @a or @b and @c;
+end;

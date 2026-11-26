@@ -1,0 +1,3 @@
+-- EXPECT: SYN002
+begin
+  let @x : int := 1;

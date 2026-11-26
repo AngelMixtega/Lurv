@@ -1,0 +1,31 @@
+-- EXPECT: OK
+begin
+    -- Datos de entrada
+    let @limite : float := 0;
+    let @contador : float := 1;
+    let @activo : logic := true;
+    -- Transformacion y reglas
+    fn ~cuadrado(@x : float) -> float => @x ' 2;
+    rule ?positivo(@x : float) :- @x ?> 0;
+    rule ?par(@x : float) :- @x %: 2 ?= 0;
+    rule ?valido(@x : float, @a : logic) :-
+        ?positivo(@x) and @a;
+    select "Introduce un limite:";
+    read @limite;
+    if ?valido(@limite, @activo) begin
+        while @contador ?<= @limite begin
+            if ?par(@contador) begin
+                select @contador, "Par";
+            end
+            else begin
+                select @contador, "Impar";
+            end;
+            select "Cuadrado:", ~cuadrado(@contador)
+                where @activo;
+            @contador := @contador +: 1;
+        end;
+    end
+    else begin
+        select "Limite invalido";
+    end;
+end;

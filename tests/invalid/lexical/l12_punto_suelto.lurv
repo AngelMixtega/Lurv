@@ -1,0 +1,4 @@
+-- EXPECT: LEX006
+begin
+  select 1 . 2;
+end;

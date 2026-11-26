@@ -1,0 +1,8 @@
+-- EXPECT: OK
+begin
+  rule ?habilitado() :- true;
+  rule ?positivo(@x : float) :- @x ?> 0;
+  rule ?rango(@x : int, @min : int, @max : int) :-
+    @x ?>= @min and @x ?<= @max;
+  rule ?valido(@x : float) :- ?positivo(@x) and ?par(@x);
+end;

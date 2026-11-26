@@ -1,0 +1,5 @@
+-- EXPECT: OK
+-- TREE: (not (not true))
+begin
+  select not not true;
+end;

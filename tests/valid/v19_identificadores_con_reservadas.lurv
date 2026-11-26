@@ -1,0 +1,8 @@
+-- EXPECT: OK
+begin
+  let @select : int := 1;
+  let @begin : int := 2;
+  fn ~select() -> int => @select;
+  rule ?end() :- true;
+  @select := ~select() +: @begin;
+end;

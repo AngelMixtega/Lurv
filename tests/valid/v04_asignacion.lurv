@@ -1,0 +1,5 @@
+-- EXPECT: OK
+begin
+  let @x : float := 1;
+  @x := @x +: 5;
+end;

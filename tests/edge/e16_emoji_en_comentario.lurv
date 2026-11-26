@@ -1,0 +1,3 @@
+-- EXPECT: OK
+-- comentario con emoji 😀 y simbolos ☃
+begin end;

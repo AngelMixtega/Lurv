@@ -1,0 +1,4 @@
+-- EXPECT: SYN001
+begin
+  while true begin end
+end;

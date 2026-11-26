@@ -1,0 +1,5 @@
+-- EXPECT: OK
+-- TREE: (10 -: (-5))
+begin
+  select 10 -: -5;
+end;

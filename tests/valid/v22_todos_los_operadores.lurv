@@ -1,0 +1,6 @@
+-- EXPECT: OK
+begin
+  select 1 +: 2, 3 -: 1, 2 *: 2, 8 /: 2, 7 %: 3, 2 ' 3;
+  select @a ?= 1, @a ?<> 1, @a ?< 1, @a ?> 1, @a ?<= 1, @a ?>= 1;
+  select not @a and @b or @c;
+end;

@@ -1,0 +1,5 @@
+-- EXPECT: OK
+-- TREE: (?par(@x) and (not ?par(@y)))
+begin
+  select ?par(@x) and not ?par(@y);
+end;

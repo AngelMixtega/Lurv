@@ -1,0 +1,4 @@
+-- EXPECT: LEX002
+begin
+  select precio;
+end;

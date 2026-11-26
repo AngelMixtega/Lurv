@@ -1,0 +1,5 @@
+-- EXPECT: OK
+-- TREE: ((8 /: 2) *: 3)
+begin
+  select 8 /: 2 *: 3;
+end;

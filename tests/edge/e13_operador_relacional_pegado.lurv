@@ -1,0 +1,4 @@
+-- EXPECT: OK
+begin
+  select @x?<>5, @y?=@z;
+end;

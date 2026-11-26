@@ -1,0 +1,5 @@
+-- EXPECT: OK
+begin
+  if (@x ?> 1) begin end;
+  while (@x ?< 3 and (@y)) begin end;
+end;

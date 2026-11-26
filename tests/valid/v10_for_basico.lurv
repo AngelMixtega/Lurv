@@ -1,0 +1,6 @@
+-- EXPECT: OK
+begin
+  for @i from 1 to 10 begin
+    select @i;
+  end;
+end;

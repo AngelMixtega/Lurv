@@ -1,0 +1,8 @@
+-- EXPECT: OK
+begin
+  select "Hola";
+  select 10 +: 5;
+  select "Hola", @n, ~doble(10);
+  select "Clasificado", @p where @p ?>= 100 and @a;
+  select "ok" where ?positivo(@p);
+end;

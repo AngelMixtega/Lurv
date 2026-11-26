@@ -1,0 +1,4 @@
+-- EXPECT: LEX004
+begin
+  select "Hola;
+end;

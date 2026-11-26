@@ -1,0 +1,4 @@
+-- EXPECT: LEX005
+begin
+  @_x := 1;
+end;

@@ -1,0 +1,5 @@
+-- EXPECT: OK
+-- TREE: ((@x +: 1) ?= (@y *: 2))
+begin
+  select @x +: 1 ?= @y *: 2;
+end;

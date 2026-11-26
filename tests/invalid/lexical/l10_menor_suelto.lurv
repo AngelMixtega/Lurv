@@ -1,0 +1,4 @@
+-- EXPECT: LEX006
+begin
+  if @a < 5 begin end;
+end;

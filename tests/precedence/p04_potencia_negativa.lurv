@@ -1,0 +1,5 @@
+-- EXPECT: OK
+-- TREE: (2 ' (-1))
+begin
+  select 2 ' -1;
+end;

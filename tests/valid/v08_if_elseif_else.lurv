@@ -1,0 +1,15 @@
+-- EXPECT: OK
+begin
+  if @n ?< 0 begin
+    select "neg";
+  end
+  elseif @n ?= 0 begin
+    select "cero";
+  end
+  elseif @n ?< 10 begin
+    select "chico";
+  end
+  else begin
+    select "grande";
+  end;
+end;

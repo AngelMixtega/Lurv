@@ -1,0 +1,7 @@
+-- EXPECT: OK
+begin
+  let @n : int := 7;
+  let @s : string := "Lurv";
+  let @b : logic := true;
+  let @c : logic := false;
+end;

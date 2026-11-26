@@ -1,0 +1,4 @@
+-- EXPECT: LEX003
+begin
+  select 5abc;
+end;

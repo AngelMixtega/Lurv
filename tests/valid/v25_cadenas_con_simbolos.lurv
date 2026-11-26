@@ -1,0 +1,4 @@
+-- EXPECT: OK
+begin
+  select "a +: b := ; -> => ?= ", "", "-- no es comentario";
+end;

@@ -1,0 +1,6 @@
+-- EXPECT: OK
+begin
+  let @x : float := "Hola";
+  rule ?estado() :- 25;
+  @y := @z +: 1;
+end;

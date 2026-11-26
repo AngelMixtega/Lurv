@@ -1,0 +1,5 @@
+-- EXPECT: OK
+begin
+  let @total_ventas_2026_q1 : int := 1;
+  fn ~f_g_h_1_2_3(@a_1 : int) -> int => @a_1;
+end;

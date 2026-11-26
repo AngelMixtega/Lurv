@@ -1,0 +1,10 @@
+-- EXPECT: OK
+begin
+  if @n %: 2 ?= 0 begin
+    select "par";
+  end
+  else begin
+    select "impar";
+  end;
+  if @n ?> 0 begin select 1; end;
+end;

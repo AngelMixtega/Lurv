@@ -1,0 +1,2 @@
+-- EXPECT: SYN002
+begin select 10 --5; end;

@@ -1,0 +1,5 @@
+-- EXPECT: OK
+-- TREE: (not (@x ?> 5))
+begin
+  select not @x ?> 5;
+end;
