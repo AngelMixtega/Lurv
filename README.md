@@ -26,5 +26,6 @@ Solo analiza el programa; no lo ejecuta.
         select "Mayor" where @x ?> 3;
     end;
 
-## Autor
-Angel Miguel Medina Mixtega
+## Autores
+- Angel Miguel Medina Mixtega
+- Jaime Uriel Flores Cabrera

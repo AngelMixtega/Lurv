@@ -70,13 +70,14 @@ public class LurvMain {
             Token t = tm.getNextToken();
             while (t.kind != LurvParserConstants.EOF) {
                 if (ErrorReporter.esTokenDeError(t)) {
-                    rechazar(out, reporter.desdeTokenLexico(t));
+                    rechazarLexico(out, reporter.desdeTokenLexico(t));
                 }
                 t = tm.getNextToken();
             }
         } catch (TokenMgrError e) {
-            rechazar(out, reporter.desdeTokenMgrError(e));
+            rechazarLexico(out, reporter.desdeTokenMgrError(e));
         }
+        out.println("Análisis léxico:     VÁLIDO");
 
         // ---- PASADA 2: analisis sintactico ----
         try {
@@ -84,12 +85,13 @@ public class LurvMain {
             parser.mostrarArbol = arbol;
             parser.Programa();
         } catch (ParseException e) {
-            rechazar(out, reporter.desdeParseException(e));
+            rechazarSintactico(out, reporter.desdeParseException(e));
         } catch (TokenMgrError e) {
-            rechazar(out, reporter.desdeTokenMgrError(e));
+            rechazarSintactico(out, reporter.desdeTokenMgrError(e));
         }
 
-        out.println("ACEPTADO: " + archivo + " (léxica y sintácticamente válido)");
+        out.println("Análisis sintáctico: VÁLIDO");
+        out.println("ACEPTADO: " + archivo);
         System.exit(0);
     }
 
@@ -98,6 +100,19 @@ public class LurvMain {
         SimpleCharStream flujo = new SimpleCharStream(new StringReader(fuente.getTexto()), 1, 1);
         flujo.setTabSize(1);
         return new LurvParserTokenManager(flujo);
+    }
+
+    /** Error en la pasada 1: la sintaxis ya no se revisa. */
+    private static void rechazarLexico(PrintStream out, LurvDiagnostic d) {
+        out.println("Análisis léxico:     NO VÁLIDO");
+        out.println("Análisis sintáctico: NO REALIZADO");
+        rechazar(out, d);
+    }
+
+    /** Error en la pasada 2: el lexico ya se habia aprobado. */
+    private static void rechazarSintactico(PrintStream out, LurvDiagnostic d) {
+        out.println("Análisis sintáctico: NO VÁLIDO");
+        rechazar(out, d);
     }
 
     /** Imprime el diagnostico y termina con codigo 1. */
